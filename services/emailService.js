@@ -35,8 +35,12 @@ const sendEmail = async (req, res) => {
     // 🔥 ADD THIS PART
     const io = req.app.get("io");
 
+    console.log("io instance in sendEmail:", io);
+
     // 🔔 notify ONLY the receiver
     io.to(user._id.toString()).emit("email:new");
+
+    console.log(`📨 New email sent from ${userId} to ${user._id}`);
 
     return res.status(201).json({
       message: "Email sent successfully",
