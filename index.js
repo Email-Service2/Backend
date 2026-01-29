@@ -91,6 +91,9 @@ io.on("connection", (socket) => {
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/email", emailRoutes);
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
 
 // DB + Server start
 mongoose
