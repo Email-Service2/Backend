@@ -19,8 +19,9 @@ const sendEmail = async (req, res) => {
     }
 
     if (user._id.equals(userId)) {
-      return res.status(404).json({ message: "Cannot send mail to self" });
+      return res.status(400).json({ message: "Cannot send mail to self" });
     }
+
     const newEmail = new Email({
       senderId: userId,
       receiverId: user._id,
@@ -28,12 +29,22 @@ const sendEmail = async (req, res) => {
       cc,
       subject,
     });
+
     await newEmail.save();
-    return res
-      .status(201)
-      .json({ message: "Email sent successfully", email: newEmail });
+
+    // 🔥 ADD THIS PART
+    const io = req.app.get("io");
+
+    // 🔔 notify ONLY the receiver
+    io.to(user._id.toString()).emit("email:new");
+
+    return res.status(201).json({
+      message: "Email sent successfully",
+      email: newEmail,
+    });
+
   } catch (err) {
-    console.error("Error logging in user:", err);
+    console.error("Error sending email:", err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
